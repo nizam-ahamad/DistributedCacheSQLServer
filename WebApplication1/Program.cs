@@ -10,16 +10,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configure SQL Server Distributed Cache
-builder.Services.AddDistributedSqlServerCache(options =>
-{
-    options.ConnectionString = builder.Configuration.GetConnectionString("CacheConnection");
-    options.SchemaName = builder.Configuration.GetValue<string>("CacheSettings:SchemaName") ?? "dbo";
-    options.TableName = builder.Configuration.GetValue<string>("CacheSettings:TableName") ?? "AppCache";
-});
-
-// Register Cache Service
-builder.Services.AddSingleton<ICacheService, SqlServerCacheService>();
+// Register File-Based Cache Service
+builder.Services.AddSingleton<ICacheService, FileCacheService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 

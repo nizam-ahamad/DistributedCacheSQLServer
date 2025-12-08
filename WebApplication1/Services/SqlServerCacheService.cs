@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
+using WebApplication1.Models;
 
 namespace WebApplication1.Services
 {
@@ -107,6 +108,11 @@ namespace WebApplication1.Services
             }
 
             return data;
+        }
+
+        public Task<CacheResult<T>> GetOrSetWithSourceAsync<T>(string key, Func<Task<T>> factory, TimeSpan? expiration = null) where T : class
+        {
+            throw new NotImplementedException();
         }
     }
 }

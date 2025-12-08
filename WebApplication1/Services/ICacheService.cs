@@ -1,3 +1,5 @@
+using WebApplication1.Models;
+
 namespace WebApplication1.Services
 {
     public interface ICacheService
@@ -7,5 +9,6 @@ namespace WebApplication1.Services
         Task RemoveAsync(string key);
         Task<bool> ExistsAsync(string key);
         Task<T?> GetOrSetAsync<T>(string key, Func<Task<T>> factory, TimeSpan? expiration = null) where T : class;
+        Task<CacheResult<T>> GetOrSetWithSourceAsync<T>(string key, Func<Task<T>> factory, TimeSpan? expiration = null) where T : class;
     }
 }

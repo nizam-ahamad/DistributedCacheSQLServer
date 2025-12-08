@@ -1,9 +1,10 @@
 ﻿using WebApplication1.Models;
+using System.Threading.Tasks;
 
 namespace WebApplication1.Repositories
 {
     public interface IUserRepository
     {
-        IEnumerable<User> GetUsers();
+        Task<IEnumerable<User>> GetUsersAsync();
     }
 }

@@ -27,21 +27,23 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            // Try to get from cache, if not found, fetch from repository and cache it
-            var users = await _cacheService.GetOrSetAsync(
+            // Get data with source tracking
+            var result = await _cacheService.GetOrSetWithSourceAsync(
                 UsersCacheKey,
                 async () =>
                 {
                     _logger.LogInformation("Fetching users from repository (cache miss)");
-                    return _userRepository.GetUsers().ToList();
+                    var users = await _userRepository.GetUsersAsync();
+                    return users.ToList();
                 },
                 TimeSpan.FromMinutes(5)
             );
 
             return Ok(new 
             { 
-                data = users,
-                source = users != null ? "cache or repository" : "none",
+                data = result.Data,
+                source = result.Source,
+                isFromCache = result.IsFromCache,
                 timestamp = DateTime.UtcNow
             });
         }
@@ -61,9 +63,21 @@ namespace WebApplication1.Controllers
             { 
                 cacheKey = UsersCacheKey, 
                 exists,
-                cacheType = "SQL Server Distributed Cache",
+                cacheType = "File-Based Cache",
                 timestamp = DateTime.UtcNow
             });
+        }
+
+        [HttpPost("cache/cleanup")]
+        public async Task<IActionResult> CleanupCache()
+        {
+            if (_cacheService is FileCacheService fileCacheService)
+            {
+                await fileCacheService.CleanupExpiredCacheAsync();
+                return Ok(new { message = "Cache cleanup completed", timestamp = DateTime.UtcNow });
+            }
+
+            return BadRequest(new { message = "Cache service does not support cleanup" });
         }
     }
 }
